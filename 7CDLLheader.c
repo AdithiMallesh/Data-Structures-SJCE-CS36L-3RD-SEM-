@@ -1,141 +1,226 @@
-/*7.implement circular double linked list with header node to perfrom 
-1. insert Rear
-2.delete immediate right node of kth node
-3.search by key */
+/*7. Develop a menu driven program to implement Circular Double linked list with
 
+Header node to perform various operations such as
+i) Insertion and Deletion at front/rear
+ii) Insertion and Deletion at the specified position
+iii) Delete by Key
+iv) Search by key
+
+v) Create an ordered list
+vi) Reverse a list
+vii) Creating a copy of the list*/
 
 #include<stdio.h>
 #include<stdlib.h>
-struct NODE
-{
-  int info;
-  struct NODE *llink;
-  struct NODE *rlink;
+
+struct NODE{ 
+    int data;
+    struct NODE *prev,*next;
 };
 typedef struct NODE * node;
 
-void insertRear(node);
-void deleteRight(node);
-void searchByValue(node);
-void Disp(node);
+void insertFront(node H){
+    node n;
+    n=(node)malloc(sizeof(struct NODE));
+    printf("Enter the data:\n");
+    scanf("%d",&n->data);
+    n->prev=H;
+    n->next=H->next;
+    n->next->prev=n;
+    H->next=n;
+    H->data++;
+}
 
-int main()
-{
-   int ch;
-   node Head;
-   Head = (node)malloc(sizeof(struct NODE));
-   Head->info = 0;
-   Head->llink=Head->rlink = Head; 
-  
-   for(;;)
-   {
-      printf("\nenter choice:\n1:InsertRear\n2:Delete immdediate right\n3:SearchByValue\n4:display\n");
-      scanf("%d",&ch);
-      switch(ch)
-      {
-	
-    case 1: insertRear(Head);Disp(Head);break;
-    case 2:  deleteRight(Head); Disp(Head);break;
-    case 3: searchByValue(Head);Disp(Head);break;
-    case 4: Disp(Head); break;
-	default:exit(0);
+void insertRear(node H){
+    node n;
+    n=(node)malloc(sizeof(struct NODE));
+    printf("Enter the data:\n");
+    scanf("%d",&n->data);
+    n->prev=H->prev;
+    n->next=H;
+    H->prev->next=n;
+    H->prev=n;
+    H->data++;
+}
 
-     }
- }
+void deleteFront(node H){
+    if(H->data==0){
+        printf("Empty List\n");
+        return;
+    }
+    node ptr=H->next;
+    printf("Node deleted at front with data:%d\n",ptr->data);
+    H->next=ptr->next;
+    ptr->next->prev=H;
+    H->data--;
+    free(ptr);
+}
 
- }
+void deleteRear(node H){
+    if(H->data==0){
+        printf("Empty List\n");
+        return;
+    }
+    node ptr=H->prev;
+    printf("Node deleted at rear with data:%d\n",ptr->data);
+    ptr->prev->next=H;
+    H->prev=ptr->prev;
+    H->data--;
+    free(ptr);
+}
 
+void insertByPosition(node H){
+    int position,count=1;
+    printf("Enter the position for new node to be inserted:\n");
+    scanf("%d",&position);
+    if(position>=1 && position<=H->data+1){
+    if(position==1) return insertFront(H);
+    if(position==H->data+1) return insertRear(H);
 
-  void Disp(node H)
-   {    node TP;
-       if(H->info==0)
-       {
-	 printf("empty\n");
-	 return;
-
-	 }
-	 TP = H->rlink;
-       printf("\nList is:\n");
-      while(TP!=H)
-       {
-	  printf("%d ", TP->info);
-	  TP =TP->rlink;
-      }
-  }
- 
-void deleteRight(node H)
-{
-    node  TN;
-    int pos, cnt;
-     if(H->info==0)
-       {
-	 printf("empty\n");
-	 return ;
-       }
-	printf("\nenter kth position:" );
-       scanf("%d",&pos);
-       if(pos>=1 && pos<=H->info)
-       {
-        if(pos==H->info)
-        {
-            printf("\ndeletion of the immediate right node is not possible\n");
-            return;
+    node n,temp=H;
+    n=(node)malloc(sizeof(struct NODE));
+    printf("Enter the data:\n");
+    scanf("%d",&n->data);
+        while(count<position){
+            temp=temp->next;
+            count++;
         }
-	 TN = H->rlink;
-	 cnt = 1;
-     pos=pos+1;
-	 while(cnt !=pos)
-	 {
-	   TN=TN->rlink ;
-	   cnt++;
-	 }
-	 TN->llink->rlink = TN->rlink;
-	 TN->rlink->llink = TN->llink;
-	 printf("Deleted (k+1)th element %d\n",TN->info);
-	 free(TN);
-	 H->info--;
-      }
-      else
-      printf("Invalid position retry\n");
+        n->next=temp->next;
+        n->prev=temp;
+        temp->next=n;
+        n->next->prev=n;
+        H->data++;
+    }else{
+        printf("Invalid Position\n");
+    }
 }
 
-void  insertRear(node H)
-    {
-       node NN;
-       NN = (node)malloc(sizeof(struct NODE));
-       printf("enter info field:");
-       scanf("%d",&NN->info);
+void deleteByPosition(node H){
+    if(H->data==0){
+        printf("Empty List\n");
+        return;
+    }
+    int position,count=1;
+    printf("Enter the position of the node to be deleted:\n");
+    scanf("%d",&position);
+    if(position>=1 && position<=H->data){
+    if(position==1) return deleteFront(H);
+    if(position==H->data) return deleteRear(H);
 
-
-       NN->rlink = H;
-       NN->llink = H->llink;
-       H->llink->rlink = NN;
-       H->llink = NN;
-       H->info++;
-	 }
-void searchByValue(node H)
-{
-    node  TN;
-    int pos, info;
-     if(H->info==0)
-       {
-	 printf("empty\n");
-	 return ;
-       }
-       printf("enter the info of the node to be searched\n");
-       scanf("%d", &info);
-      TN = H->rlink;
-      pos = 1;
-      while(TN!=H && TN->info !=info)
-      {
-	  TN=TN->rlink;  pos++;
-      }
-       if(TN == H)
-       printf("Node does not exist\n");
-       else
-
-	 printf("node with the info %dwhich  is present at position %d \n", TN->info, pos);
-
-
+    node temp=H->next;
+    while(count!=position){
+        temp=temp->next;
+        count++;
+    }
+    temp->prev->next=temp->next;
+    temp->next->prev=temp->prev;
+    printf("Node deleted with data:%d\n",temp->data);
+    H->data--;
+    free(temp);
+    }else{
+        printf("Invalid Position\n");
+    }
 }
 
+void deleteByValue(node H){
+    if(H->data==0){
+        printf("Empty List\n");
+        return;
+    }
+    node temp=H->next;
+    int data,position=1;
+    printf("Enter the data of the node to be deleted:\n");
+    scanf("%d",&data);
+    while(temp!=H && temp->data!=data){
+        temp=temp->next;
+        position++;
+    }
+    if(temp==H){
+        printf("Node with data %d doesnt exist\n",data);
+    }else{
+        if(position==1) return deleteFront(H);
+        if(position==H->data+1) return deleteRear(H);
+
+        printf("Node deleted with data:%d from position: %d\n",temp->data,position);
+        temp->prev->next=temp->next;
+        temp->next->prev=temp->prev;
+        free(temp);
+        H->data--;
+    }
+}
+
+void findNode(node H){
+    if(H->data==0){
+        printf("Empty List\n");
+        return;
+    }
+    int position=1,data;
+    printf("Enter the data of the node to be searched:\n");
+    scanf("%d",&data);
+    node temp=H->next;
+    while(temp!=H && temp->data!=data){
+        temp=temp->next;
+        position++;
+    }
+    if(temp==H){
+        printf("Node with data %d doesnt exist\n",data);
+    }else{
+        printf("Node with data %d exists at position: %d\n",data,position);
+    }
+}
+
+void display(node H){
+    if(H->data==0){
+        printf("Empty List\n");
+        return;
+    }
+    node temp;
+    temp=H->next;
+    printf("Total no. of nodes:%d\n",H->data);
+    printf("CDLL:\t");
+    while(temp!=H){
+        printf("(%d)<->",temp->data);
+        temp=temp->next;
+    }
+}
+
+int main(){
+    int choice;
+    node head;
+    head=(node)malloc(sizeof(struct NODE));
+    head->data=0;//*keeps the count of total no. of nodes
+    head->prev=head->next=head;
+    while(1){
+        printf("\n1:Insert Front\n2:Display\n3:Insert Rear\n4:Delete Front\n5:Delete Rear\n6:Insert By Position\n7:Delete By Position\n8:Delete By Value\n9:Search Node\n");
+        printf("Enter your choice:");
+        scanf("%d",&choice);
+        switch(choice){
+            case 1: insertFront(head);
+                    display(head);
+                    break;
+            case 2: display(head);break;
+            case 3: insertRear(head);    
+                    display(head);
+                    break;
+            case 4: deleteFront(head);    
+                    display(head);
+                    break;
+            case 5: deleteRear(head);    
+                    display(head);
+                    break;
+            case 6: insertByPosition(head);    
+                    display(head);
+                    break;
+            case 7: deleteByPosition(head);    
+                    display(head);
+                    break;
+            case 8: deleteByValue(head);    
+                    display(head);
+                    break;
+            case 9: findNode(head);
+                    break;
+            default:exit(0);
+        }
+    }
+    return 0;
+}
